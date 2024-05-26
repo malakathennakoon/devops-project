@@ -13,11 +13,17 @@ provider "aws" {
 
 
 resource "aws_instance" "demo-server" {
-  ami           = "ami-0d94353f7bad10668"
+  ami           = "ami-04b70fa74e45c3917"
   instance_type = "t2.micro"
   key_name      = "DevOps_Project"
-  security_groups = [ "demo-sg" ]
+  //security_groups = [ "demo-sg" ]
+  vpc_security_group_ids = [ aws_security_group.demo-sg.id ]
   subnet_id = aws_subnet.ms-subnet-01.id
+
+for_each = toset( ["jenkins-server", "build-server", "ansible"])
+  tags = {
+    Name = "${each.key}"
+  }
 }
 
 resource "aws_security_group" "demo-sg" {
@@ -108,7 +114,7 @@ resource "aws_route_table_association" "subnet01-2-rt" {
   route_table_id = aws_route_table.ms-route-table.id
 }
 
-resource "aws_route_table_association" "subnet01-2-rt" {
+resource "aws_route_table_association" "subnet02-2-rt" {
   subnet_id      = aws_subnet.ms-subnet-02.id
   route_table_id = aws_route_table.ms-route-table.id
 }
